@@ -218,8 +218,6 @@ def model_selection(args):
                 print('*' * 75)
     print('Best accuracy for {} is {}'.format(args.dataset, best_acc))
 
-
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='GAT')
@@ -262,7 +260,7 @@ if __name__ == '__main__':
                         help="skip re-evaluate the validation set")
     parser.add_argument('--rand_seed', default=0,
                         help="skip re-evaluate the validation set")
-    parser.add_argument('--shuffle', default=0,
+    parser.add_argument('--shuffle', default=1,
                         help="random split")
     args = parser.parse_args()
     # print(args)
