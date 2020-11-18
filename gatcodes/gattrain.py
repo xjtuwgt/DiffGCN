@@ -100,7 +100,7 @@ def main(args):
     val_mask = g.ndata['val_mask']
     test_mask = g.ndata['test_mask']
 
-    if args.shuffle == 1:
+    if args.shuffle:
         print('Random splitting...')
         ####
         train_dev_test_tuple = (train_mask.sum().data.item(), val_mask.sum().data.item(), test_mask.sum().data.item())
@@ -232,6 +232,8 @@ if __name__ == '__main__':
     )
     parser.add_argument("--gpu", type=int, default=-1,
                         help="which GPU to use. Set -1 to use CPU.")
+    parser.add_argument('--cuda', action='store_true',
+                        help='Use CUDA preprocessing.')
     parser.add_argument("--epochs", type=int, default=200,
                         help="number of training epochs")
     parser.add_argument("--num-heads", type=int, default=8,
@@ -260,7 +262,7 @@ if __name__ == '__main__':
                         help="skip re-evaluate the validation set")
     parser.add_argument('--rand_seed', default=0,
                         help="skip re-evaluate the validation set")
-    parser.add_argument('--shuffle', default=1,
+    parser.add_argument('--shuffle', action='store_true',
                         help="random split")
     args = parser.parse_args()
     # print(args)
