@@ -41,7 +41,7 @@ parser.add_argument('--weight_decay', default=1e-4, type=float) #5e-4
 parser.add_argument('--lr', default=0.01, type=float) #5e-4
 parser.add_argument('--layers', default=3, type=int) #5e-4
 parser.add_argument('--rand_seed', default=0, type=int) #5e-4
-parser.add_argument('--shuffle', default=True, action='store_true',
+parser.add_argument('--shuffle', default=False, action='store_true',
                     help='Use GDC preprocessing.')
 
 
@@ -81,15 +81,14 @@ def main(args):
                                                dim=0), exact=True)
         data = gdc(data)
         if args.shuffle:
+            print('Performing shuffle...')
             train_dev_test_tuple = (data.train_mask.sum().data.item(), data.val_mask.sum().data.item(), data.test_mask.sum().item())
             train_mask, val_mask, test_mask = random_split(N=data.train_mask.shape[0], train_dev_test_tuple=train_dev_test_tuple, random_seed=args.rand_seed)
             data.train_mask = train_mask
             data.val_mask = val_mask
             data.test_mask = test_mask
-
-        print(data.train_mask.sum())
-        print(data.val_mask.sum())
-        print(data.test_mask.sum())
+        else:
+            print('Standard splitting...')
 
     class Net(torch.nn.Module):
         def __init__(self):
