@@ -38,64 +38,7 @@ class PositionwiseFeedForward(nn.Module):
         nn.init.xavier_normal_(self.w_2.weight, gain=gain)
 
 
-class Net(torch.nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
-                             normalize=not args.use_gdc)
-        self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
-                             normalize=not args.use_gdc)
 
-    def forward(self):
-        x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
-        x = F.relu(self.conv1(x, edge_index, edge_weight))
-        x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index, edge_weight)
-        return F.log_softmax(x, dim=1)
-
-
-class NetLayerNorm_FF(torch.nn.Module):
-    def __init__(self):
-        super(NetLayerNorm_FF, self).__init__()
-        self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
-                             normalize=not args.use_gdc)
-        self.layer_norm_1 = torch.nn.LayerNorm(16)
-        self.ff_layer = PositionwiseFeedForward(model_dim=16, d_hidden=8 * 16)
-        self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
-                             normalize=not args.use_gdc)
-
-    def forward(self):
-        x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
-        x = self.conv1(x, edge_index, edge_weight)
-        norm_x = self.layer_norm_1(x)
-        norm_x = F.dropout(norm_x, training=self.training)
-        x = self.ff_layer(x + norm_x)
-        x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index, edge_weight)
-        return F.log_softmax(x, dim=1)
-
-
-class DeepNet(torch.nn.Module):
-    def __init__(self, layers=3):
-        super(DeepNet, self).__init__()
-        self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
-                             normalize=not args.use_gdc)
-        self.multi_conv_layers = nn.ModuleList()
-        self.multi_conv_layers.append(self.conv1)
-        for i in range(1, layers):
-            layer_i = GCNConv(16, 16, cached=True,
-                              normalize=not args.use_gdc)
-            self.multi_conv_layers.append(layer_i)
-        self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
-                             normalize=not args.use_gdc)
-
-    def forward(self):
-        x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
-        for layer_i in self.multi_conv_layers:
-            x = F.relu(layer_i(x, edge_index, edge_weight)) + x
-            x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index, edge_weight)
-        return F.log_softmax(x, dim=1)
 
 def main(args):
     dataset = args.data
@@ -111,6 +54,62 @@ def main(args):
                                                dim=0), exact=True)
         data = gdc(data)
 
+    class Net(torch.nn.Module):
+        def __init__(self):
+            super(Net, self).__init__()
+            self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+                                 normalize=not args.use_gdc)
+            self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+                                 normalize=not args.use_gdc)
+
+        def forward(self):
+            x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
+            x = F.relu(self.conv1(x, edge_index, edge_weight))
+            x = F.dropout(x, training=self.training)
+            x = self.conv2(x, edge_index, edge_weight)
+            return F.log_softmax(x, dim=1)
+
+    class NetLayerNorm_FF(torch.nn.Module):
+        def __init__(self):
+            super(NetLayerNorm_FF, self).__init__()
+            self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+                                 normalize=not args.use_gdc)
+            self.layer_norm_1 = torch.nn.LayerNorm(16)
+            self.ff_layer = PositionwiseFeedForward(model_dim=16, d_hidden=8 * 16)
+            self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+                                 normalize=not args.use_gdc)
+
+        def forward(self):
+            x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
+            x = self.conv1(x, edge_index, edge_weight)
+            norm_x = self.layer_norm_1(x)
+            norm_x = F.dropout(norm_x, training=self.training)
+            x = self.ff_layer(x + norm_x)
+            x = F.dropout(x, training=self.training)
+            x = self.conv2(x, edge_index, edge_weight)
+            return F.log_softmax(x, dim=1)
+
+    class DeepNet(torch.nn.Module):
+        def __init__(self, layers=3):
+            super(DeepNet, self).__init__()
+            self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+                                 normalize=not args.use_gdc)
+            self.multi_conv_layers = nn.ModuleList()
+            self.multi_conv_layers.append(self.conv1)
+            for i in range(1, layers):
+                layer_i = GCNConv(16, 16, cached=True,
+                                  normalize=not args.use_gdc)
+                self.multi_conv_layers.append(layer_i)
+            self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+                                 normalize=not args.use_gdc)
+
+        def forward(self):
+            x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
+            for layer_i in self.multi_conv_layers:
+                x = F.relu(layer_i(x, edge_index, edge_weight)) + x
+                x = F.dropout(x, training=self.training)
+            x = self.conv2(x, edge_index, edge_weight)
+            return F.log_softmax(x, dim=1)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if args.model == 'Net':
