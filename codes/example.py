@@ -236,7 +236,7 @@ def model_selection(args):
                             best_acc = test_acc_i
                             best_setting = [ppr, topk, hid_dim, lr, weight_decay]
                         print('*' * 75)
-    print('Data: {} Model: {}Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
+    print('Data: {} Model: {} Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
 
 
 model_selection(args=args)
