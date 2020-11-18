@@ -188,8 +188,10 @@ def main(args):
         model, data = Net().to(device), data.to(device)
     elif args.model == 'NetFF':
         model, data = NetLayerNorm_FF().to(device), data.to(device)
-    else:
+    elif args.model == 'Deep':
         model, data = DeepNet().to(device), data.to(device)
+    else:
+        raise ValueError('model %s not supported' % args.model)
     optimizer = torch.optim.Adam([
         dict(params=model.conv1.parameters(), weight_decay=args.weight_decay),
         dict(params=model.conv2.parameters(), weight_decay=0)
