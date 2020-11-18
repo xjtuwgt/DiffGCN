@@ -19,6 +19,7 @@ parser.add_argument('--hid_dim', default=16, type=int)  #16
 parser.add_argument('--weight_decay', default=1e-4, type=float) #5e-4
 parser.add_argument('--lr', default=0.01, type=float) #5e-4
 parser.add_argument('--layers', default=3, type=int) #5e-4
+parser.add_argument('--rand_seed', default=0, type=int) #5e-4
 
 args = parser.parse_args()
 
@@ -56,9 +57,9 @@ def main(args):
                                                dim=0), exact=True)
         data = gdc(data)
 
-        print(data.train_mask)
-        print(data.val_mask)
-        print(data.test_mask)
+        print(data.train_mask.sum())
+        print(data.val_mask.sum())
+        print(data.test_mask.sum())
 
     class Net(torch.nn.Module):
         def __init__(self):
