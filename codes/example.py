@@ -216,7 +216,7 @@ def model_selection(args):
     topk_range = [32, 64, 128]
     hid_dim_range = [16, 64, 128, 256]
     lr_range = [0.01, 0.005]
-    weight_decay_range = [1e-4]
+    weight_decay_range = [1e-4, 5e-5]
     best_acc = 0
     for ppr in ppr_range:
         for topk in topk_range:
