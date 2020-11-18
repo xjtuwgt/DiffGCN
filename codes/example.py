@@ -2,6 +2,7 @@ import os.path as osp
 import argparse
 
 import torch
+from torch import nn
 import torch.nn.functional as F
 from torch_geometric.datasets import Planetoid
 import torch_geometric.transforms as T
@@ -26,17 +27,39 @@ if args.use_gdc:
     data = gdc(data)
 
 
+class PositionwiseFeedForward(nn.Module):
+    "Implements FFN equation."
+    def __init__(self, model_dim, d_hidden, dropout=0.1):
+        super(PositionwiseFeedForward, self).__init__()
+        self.w_1 = nn.Linear(model_dim, d_hidden)
+        self.w_2 = nn.Linear(d_hidden, model_dim)
+        self.dropout = nn.Dropout(dropout)
+        self.init()
+
+    def forward(self, x):
+        return self.w_2(self.dropout(F.relu(self.w_1(x))))
+
+    def init(self):
+        gain = nn.init.calculate_gain('relu')
+        nn.init.xavier_normal_(self.w_1.weight, gain=gain)
+        nn.init.xavier_normal_(self.w_2.weight, gain=gain)
+
 class Net(torch.nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
                              normalize=not args.use_gdc)
+        self.layer_norm_1 = torch.nn.LayerNorm(16)
+        self.ff_layer = PositionwiseFeedForward(model_dim=16, d_hidden=8 * 16)
         self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
                              normalize=not args.use_gdc)
 
     def forward(self):
         x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
-        x = F.relu(self.conv1(x, edge_index, edge_weight))
+        #x = F.relu(self.conv1(x, edge_index, edge_weight))
+        x = self.conv1(x, edge_index, edge_weight)
+        norm_x = self.layer_norm_1(x)
+        x = self.ff_layer(x + norm_x)
         x = F.dropout(x, training=self.training)
         x = self.conv2(x, edge_index, edge_weight)
         return F.log_softmax(x, dim=1)
