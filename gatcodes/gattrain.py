@@ -22,7 +22,6 @@ import torch
 import random
 import dgl
 import os
-from time import time
 from dgl import DGLGraph
 
 def set_seeds(seed):

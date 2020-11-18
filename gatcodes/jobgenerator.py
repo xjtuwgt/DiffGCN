@@ -9,19 +9,20 @@ def remove_all_files(dirpath):
         except OSError:
             os.remove(filepath)
 
-def generate_random_search_bash(task_num, data_name):
-    bash_save_path = '../' + data_name + '_jobs/'
+def generate_random_search_bash(rand_seed=0):
+    bash_save_path = '../gat_jobs/'
+    data_names = ['cora', 'citeseer', 'pubmed']
     if os.path.exists(bash_save_path):
         remove_all_files(bash_save_path)
     if bash_save_path and not os.path.exists(bash_save_path):
         os.makedirs(bash_save_path)
-    for i in range(task_num):
-        task_id = str(i+1)
-        with open(bash_save_path + 'gat_run_' + data_name + '_' + task_id +'.sh', 'w') as rsh_i:
+    for data_name in data_names:
+        task_id = str(rand_seed)
+        with open(bash_save_path + 'gat_run_' + task_id +'.sh', 'w') as rsh_i:
             command_i = 'bash gatrun.sh ' + task_id + ' ' + data_name
             rsh_i.write(command_i)
-    print('{} jobs have been generated'.format(task_num))
+    print('{} jobs have been generated'.format(len(data_names)))
 
 
 if __name__ == '__main__':
-    generate_random_search_bash(task_num=5, data_name='cora')
+    generate_random_search_bash(rand_seed=0)
