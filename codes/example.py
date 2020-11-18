@@ -15,7 +15,7 @@ parser.add_argument('--data', default='Cora')
 parser.add_argument('--model', default='Net')
 parser.add_argument('--ppr', default=0.15, type=float) # 0.05
 parser.add_argument('--topk', default=5, type=int)  #128
-parser.add_argument('--hid_dim', default=512, type=int)  #16
+parser.add_argument('--hid_dim', default=16, type=int)  #16
 
 args = parser.parse_args()
 
@@ -87,14 +87,17 @@ def main(args):
         def forward(self):
             x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
             convx = self.conv1(x, edge_index, edge_weight)
-            norm_x = self.layer_norm_1(convx)
-            norm_x = F.dropout(norm_x, training=self.training)
             if self.res_fc is not None:
                 res_x = self.res_fc(x)
             else:
                 res_x = x
-            x = self.ff_layer(res_x + norm_x)
-            x = F.dropout(x, training=self.training)
+            convx = convx + res_x
+            norm_x = self.layer_norm_1(convx)
+            norm_x = F.dropout(norm_x, training=self.training)
+
+            x_ff = self.ff_layer(norm_x)
+            x_ff = F.dropout(x_ff, training=self.training)
+            x = norm_x + x_ff
             x = self.conv2(x, edge_index, edge_weight)
             return F.log_softmax(x, dim=1)
 
