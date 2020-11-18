@@ -14,7 +14,7 @@ parser.add_argument('--use_gdc', default=True, action='store_true',
 parser.add_argument('--data', default='Cora')
 parser.add_argument('--model', default='Net')
 parser.add_argument('--ppr', default=0.15)
-parser.add_argument('--topk', default=5)
+parser.add_argument('--k', default=5)
 
 args = parser.parse_args()
 
@@ -50,7 +50,7 @@ def main(args):
         gdc = T.GDC(self_loop_weight=1, normalization_in='sym',
                     normalization_out='col',
                     diffusion_kwargs=dict(method='ppr', alpha=args.ppr), ## orig 0.05
-                    sparsification_kwargs=dict(method='topk', k=args.topk,
+                    sparsification_kwargs=dict(method='topk', k=args.k,
                                                dim=0), exact=True)
         data = gdc(data)
 
