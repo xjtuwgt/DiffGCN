@@ -153,6 +153,8 @@ def main(args):
 
     # initialize graph
     dur = []
+    best_val_acc = 0
+    test_acc = 0
     for epoch in range(args.epochs):
         model.train()
         if epoch >= 3:
@@ -178,21 +180,45 @@ def main(args):
                 if stopper.step(val_acc, model):
                     break
 
+        if best_val_acc < val_acc:
+            best_val_acc = val_acc
+            test_acc = evaluate(model, features, labels, test_mask)
+
         print("Epoch {:05d} | Time(s) {:.4f} | Loss {:.4f} | TrainAcc {:.4f} |"
-              " ValAcc {:.4f} | ETputs(KTEPS) {:.2f}".
+              " ValAcc {:.4f} TestAcc {:.4f}| ETputs(KTEPS) {:.2f}".
               format(epoch, np.mean(dur), loss.item(), train_acc,
-                     val_acc, n_edges / np.mean(dur) / 1000))
+                     val_acc, test_acc, n_edges / np.mean(dur) / 1000))
 
     print()
     if args.early_stop:
         model.load_state_dict(torch.load('es_checkpoint.pt'))
     acc = evaluate(model, features, labels, test_mask)
     print("Test Accuracy {:.4f}".format(acc))
+    print('Test Accuracy {:.4f}'.format(test_acc))
+    return test_acc
 
 
-def model_selection():
-    num_hidden = [8, 16, 32]
-    in_drop = [0.2, 0.3, 0.4, 0.5, 0.6]
+def model_selection(args, data):
+    num_hidden_range = [8, 16, 32]
+    in_drop_range = [0.2, 0.3, 0.4, 0.5, 0.6]
+    att_drop_range = [0.2, 0.3, 0.4, 0.6]
+    lr_range = [0.005, 0.01]
+    best_acc = 0
+    args.dataset = data
+    for num_hidden in num_hidden_range:
+        for in_drop in in_drop_range:
+            for att_drop in att_drop_range:
+                for lr in lr_range:
+                    args.num_hidden = num_hidden
+                    args.in_drop = in_drop
+                    args.attn_drop = att_drop
+                    args.lr = lr
+                    acc_i = main(args)
+                    if best_acc < acc_i:
+                        best_acc = acc_i
+                print('*' * 75)
+    print('Best accuracy for {} is {}'.format(data, best_acc))
+
 
 
 if __name__ == '__main__':
@@ -240,6 +266,7 @@ if __name__ == '__main__':
     parser.add_argument('--shuffle', default=0,
                         help="random split")
     args = parser.parse_args()
-    print(args)
+    # print(args)
 
-    main(args)
+    # main(args)
+    model_selection(args=args, data='cora')
