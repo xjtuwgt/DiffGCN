@@ -198,13 +198,12 @@ def main(args):
     return test_acc
 
 
-def model_selection(args, data):
+def model_selection(args):
     num_hidden_range = [8, 16, 32]
     in_drop_range = [0.2, 0.3, 0.4, 0.5, 0.6]
     att_drop_range = [0.2, 0.3, 0.4, 0.6]
     lr_range = [0.005, 0.01]
     best_acc = 0
-    args.dataset = data
     for num_hidden in num_hidden_range:
         for in_drop in in_drop_range:
             for att_drop in att_drop_range:
@@ -217,7 +216,7 @@ def model_selection(args, data):
                     if best_acc < acc_i:
                         best_acc = acc_i
                 print('*' * 75)
-    print('Best accuracy for {} is {}'.format(data, best_acc))
+    print('Best accuracy for {} is {}'.format(args.dataset, best_acc))
 
 
 
@@ -269,4 +268,4 @@ if __name__ == '__main__':
     # print(args)
 
     # main(args)
-    model_selection(args=args, data='cora')
+    model_selection(args=args)
