@@ -166,7 +166,7 @@ def main(args):
 
 def model_selection(args):
     data = 'Cora'
-    model = 'Net'
+    model = 'NetFF'
     ppr_range = [0.05, 0.1, 0.15, 0.2, 0.25]
     topk_range = [32, 64, 128]
     hid_dim_range = [16, 32, 64, 128, 256]
