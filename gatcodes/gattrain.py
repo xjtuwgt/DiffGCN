@@ -227,7 +227,6 @@ def model_selection(args):
     print('Best accuracy for {} is {}'.format(args.dataset, best_acc))
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser(description='GAT')
     # register_data_args(parser)
     parser.add_argument(
