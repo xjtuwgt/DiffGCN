@@ -60,7 +60,7 @@ def main(args):
             super(Net, self).__init__()
             self.conv1 = GCNConv(dataset.num_features, args.hid_dim, cached=True,
                                  normalize=not args.use_gdc)
-            self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+            self.conv2 = GCNConv(args.hid_dim, dataset.num_classes, cached=True,
                                  normalize=not args.use_gdc)
 
         def forward(self):
