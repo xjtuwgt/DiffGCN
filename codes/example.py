@@ -44,9 +44,7 @@ parser.add_argument('--rand_seed', default=0, type=int) #5e-4
 parser.add_argument('--shuffle', default=False, action='store_true',
                     help='Use GDC preprocessing.')
 
-
 args = parser.parse_args()
-
 
 class PositionwiseFeedForward(nn.Module):
     "Implements FFN equation."
@@ -210,8 +208,6 @@ def main(args):
     return test_acc
 
 def model_selection(args):
-    data = 'Cora'
-    model = 'NetFF'
     best_setting = None
     ppr_range = [0.05, 0.1, 0.15, 0.2]
     topk_range = [32, 64]
@@ -225,8 +221,6 @@ def model_selection(args):
                 for lr in lr_range:
                     for weight_decay in weight_decay_range:
                         args.ppr = ppr
-                        args.data = data
-                        args.model = model
                         args.topk = topk
                         args.lr = lr
                         args.weight_decay = weight_decay
@@ -236,7 +230,7 @@ def model_selection(args):
                             best_acc = test_acc_i
                             best_setting = [ppr, topk, hid_dim, lr, weight_decay]
                         print('*' * 75)
-    print('Data: {} Model: {} Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
+    print('Data: {} Model: {} Best acc = {}, best setting = {}'.format(args.data, args.model, best_acc, best_setting))
 
 
 model_selection(args=args)

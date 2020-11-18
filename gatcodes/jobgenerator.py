@@ -18,7 +18,7 @@ def generate_random_search_bash(task_num, data_name):
     for i in range(task_num):
         task_id = str(i+1)
         with open(bash_save_path + 'run_' + task_id +'.sh', 'w') as rsh_i:
-            command_i = 'bash gatrun.sh ' + task_id
+            command_i = 'bash gatrun.sh ' + task_id + ' ' + data_name
             rsh_i.write(command_i)
     print('{} jobs have been generated'.format(task_num))
 
