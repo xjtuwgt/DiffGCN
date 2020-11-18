@@ -226,10 +226,10 @@ def main(args):
 
 
 def model_selection(args):
-    num_hidden_range = [8, 16, 32]
+    num_hidden_range = [8, 16]
     in_drop_range = [0.2, 0.4, 0.6]
     att_drop_range = [0.2, 0.4, 0.6]
-    lr_range = [0.005, 0.01]
+    lr_range = [0.005]
     best_acc = 0
     for num_hidden in num_hidden_range:
         for in_drop in in_drop_range:
