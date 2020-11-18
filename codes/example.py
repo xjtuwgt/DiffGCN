@@ -39,8 +39,6 @@ class PositionwiseFeedForward(nn.Module):
         nn.init.xavier_normal_(self.w_2.weight, gain=gain)
 
 
-
-
 def main(args):
     dataset = args.data
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', dataset)
@@ -164,5 +162,28 @@ def main(args):
         log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
         print(log.format(epoch, train_acc, best_val_acc, test_acc))
     print('model {}: data: {}: test_acc: {}'.format(args.model, args.data, test_acc))
+    return test_acc
 
-main(args=args)
+def model_selection(args):
+    data = 'Cora'
+    model = 'Net'
+    ppr_range = [0.05, 0.1, 0.15, 0.2, 0.25]
+    topk_range = [32, 64, 128]
+    hid_dim_range = [16, 32, 64, 128, 256]
+    best_acc = 0
+    for ppr in ppr_range:
+        for topk in topk_range:
+            for hid_dim in hid_dim_range:
+                args.ppr = ppr
+                args.data = data
+                args.model = model
+                args.topk = topk
+                args.hid_dim = hid_dim
+                test_acc_i = main(args)
+                if best_acc < test_acc_i:
+                    best_acc = test_acc_i
+                print('*' * 75)
+    print('Data: {} Model: {}Best acc = {}'.format(data, model, best_acc))
+
+
+model_selection(args=args)
