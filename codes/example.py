@@ -153,7 +153,6 @@ def main(args):
             accs.append(acc)
         return accs
 
-
     best_val_acc = test_acc = 0
     for epoch in range(1, 201):
         train()
@@ -170,11 +169,11 @@ def model_selection(args):
     data = 'Cora'
     model = 'NetFF'
     best_setting = None
-    ppr_range = [0.05, 0.1, 0.15, 0.2]
-    topk_range = [64, 128]
-    hid_dim_range = [16, 64, 256]
+    ppr_range = [0.05, 0.1, 0.15, 0.2, 0.25]
+    topk_range = [32, 64, 128]
+    hid_dim_range = [16, 32, 64, 128, 256]
     lr_range = [0.01, 0.005]
-    weight_decay_range = [1e-4, 5e-5, 1e-5]
+    weight_decay_range = [1e-4, 5e-5]
     best_acc = 0
     for ppr in ppr_range:
         for topk in topk_range:
