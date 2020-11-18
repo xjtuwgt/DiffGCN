@@ -107,7 +107,11 @@ def main(args):
             self.conv1 = GCNConv(dataset.num_features, args.hid_dim, cached=True,
                                  normalize=not args.use_gdc)
             self.multi_conv_layers = nn.ModuleList()
-            self.multi_conv_layers.append(self.conv1)
+            if dataset.num_features != args.hid_dim:
+                self.res_fc = nn.Linear(dataset.num_features, args.hid_dim, bias=False)
+            else:
+                self.res_fc = None
+
             for i in range(1, layers):
                 layer_i = GCNConv(args.hid_dim, args.hid_dim, cached=True,
                                   normalize=not args.use_gdc)
@@ -117,8 +121,13 @@ def main(args):
 
         def forward(self):
             x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
+            x = F.relu(self.conv1(x, edge_index, edge_weight))
+            if self.res_fc is not None:
+                res_x = self.res_fc(x)
+            x = x + res_x
             for layer_i in self.multi_conv_layers:
-                x = F.relu(layer_i(x, edge_index, edge_weight)) + x
+                x_temp = F.dropout(x, training=self.training)
+                x = F.relu(layer_i(x_temp, edge_index, edge_weight)) + x
                 x = F.dropout(x, training=self.training)
             x = self.conv2(x, edge_index, edge_weight)
             return F.log_softmax(x, dim=1)
