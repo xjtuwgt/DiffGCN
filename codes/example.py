@@ -9,12 +9,7 @@ import torch_geometric.transforms as T
 from torch_geometric.nn import GCNConv, ChebConv  # noqa
 
 import numpy as np
-import torch
-import random
-import dgl
 import os
-from time import time
-from dgl import DGLGraph
 
 def set_seeds(seed):
     "set random seeds"
@@ -27,7 +22,6 @@ def set_seeds(seed):
     # some cudnn methods can be random even after fixing the seed
     # unless you tell it to be deterministic
     torch.backends.cudnn.deterministic = True
-    dgl.random.seed(seed)
 
 
 import random
