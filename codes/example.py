@@ -8,6 +8,27 @@ from torch_geometric.datasets import Planetoid
 import torch_geometric.transforms as T
 from torch_geometric.nn import GCNConv, ChebConv  # noqa
 
+
+import random
+import torch
+def random_split(N, train_dev_test_tuple, random_seed: int = 0):
+    random.seed(random_seed)
+    data_ids = [i for i in range(N)]
+    train_mask, valid_mask, test_mask = torch.zeros(N), torch.zeros(N), torch.zeros(N)
+    train_size, valid_size, test_size = train_dev_test_tuple
+    random.shuffle(data_ids)
+    train_ids = data_ids[:train_size]
+    valid_ids = data_ids[train_size:(train_size+valid_size)]
+    test_ids = data_ids[(train_size+valid_size): (train_size + valid_size + test_size)]
+    train_mask[train_ids] = 1
+    valid_mask[valid_ids] = 1
+    test_mask[test_ids] = 1
+    assert train_mask.sum() == train_size
+    train_mask = train_mask.type(torch.bool)
+    valid_mask = valid_mask.type(torch.bool)
+    test_mask = test_mask.type(torch.bool)
+    return train_mask, valid_mask, test_mask
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--use_gdc', default=True, action='store_true',
                     help='Use GDC preprocessing.')
@@ -20,6 +41,9 @@ parser.add_argument('--weight_decay', default=1e-4, type=float) #5e-4
 parser.add_argument('--lr', default=0.01, type=float) #5e-4
 parser.add_argument('--layers', default=3, type=int) #5e-4
 parser.add_argument('--rand_seed', default=0, type=int) #5e-4
+parser.add_argument('--shuffle', default=True, action='store_true',
+                    help='Use GDC preprocessing.')
+
 
 args = parser.parse_args()
 
@@ -56,6 +80,12 @@ def main(args):
                     sparsification_kwargs=dict(method='topk', k=args.topk,
                                                dim=0), exact=True)
         data = gdc(data)
+        if args.shuffle:
+            train_dev_test_tuple = (data.train_mask.sum().data.item(), data.val_mask.sum().data.item(), data.test_mask.sum().item())
+            train_mask, val_mask, test_mask = random_split(N=data.train_mask.shape[0], train_dev_test_tuple=train_dev_test_tuple, random_seed=args.rand_seed)
+            data.train_mask = train_mask
+            data.val_mask = val_mask
+            data.test_mask = test_mask
 
         print(data.train_mask.sum())
         print(data.val_mask.sum())
