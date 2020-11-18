@@ -167,6 +167,7 @@ def main(args):
 def model_selection(args):
     data = 'Cora'
     model = 'NetFF'
+    best_setting = None
     ppr_range = [0.05, 0.1, 0.15, 0.2, 0.25]
     topk_range = [32, 64, 128]
     hid_dim_range = [16, 32, 64, 128, 256]
@@ -182,8 +183,9 @@ def model_selection(args):
                 test_acc_i = main(args)
                 if best_acc < test_acc_i:
                     best_acc = test_acc_i
+                    best_setting = [ppr, topk, hid_dim]
                 print('*' * 75)
-    print('Data: {} Model: {}Best acc = {}'.format(data, model, best_acc))
+    print('Data: {} Model: {}Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
 
 
 model_selection(args=args)
