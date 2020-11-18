@@ -162,7 +162,7 @@ def main(args):
                 self.res_fc = None
 
             self.multi_conv_layers = nn.ModuleList()
-            for i in range(1, layers):
+            for i in range(2, layers):
                 layer_i = GCNConv(args.hid_dim, args.hid_dim, cached=True,
                                   normalize=not args.use_gdc)
                 self.multi_conv_layers.append(layer_i)
@@ -176,8 +176,9 @@ def main(args):
                 res_x = self.res_fc(x)
             x = x + res_x
             for layer_i in self.multi_conv_layers:
-                x_temp = F.dropout(x, training=self.training)
-                x = F.relu(layer_i(x_temp, edge_index, edge_weight)) + x
+                x_temp = x
+                x = F.relu(layer_i(x, edge_index, edge_weight))
+                x = x + x_temp
                 x = F.dropout(x, training=self.training)
             x = self.conv2(x, edge_index, edge_weight)
             return F.log_softmax(x, dim=1)
