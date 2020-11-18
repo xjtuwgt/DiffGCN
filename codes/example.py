@@ -13,8 +13,9 @@ parser.add_argument('--use_gdc', default=True, action='store_true',
                     help='Use GDC preprocessing.')
 parser.add_argument('--data', default='Cora')
 parser.add_argument('--model', default='Net')
-parser.add_argument('--ppr', default=0.15, type=float)
-parser.add_argument('--topk', default=5, type=int)
+parser.add_argument('--ppr', default=0.15, type=float) # 0.05
+parser.add_argument('--topk', default=5, type=int)  #128
+parser.add_argument('--hid_dim', default=512, type=int)  #16
 
 args = parser.parse_args()
 
@@ -57,7 +58,7 @@ def main(args):
     class Net(torch.nn.Module):
         def __init__(self):
             super(Net, self).__init__()
-            self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+            self.conv1 = GCNConv(dataset.num_features, args.hid_dim, cached=True,
                                  normalize=not args.use_gdc)
             self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
                                  normalize=not args.use_gdc)
@@ -72,11 +73,11 @@ def main(args):
     class NetLayerNorm_FF(torch.nn.Module):
         def __init__(self):
             super(NetLayerNorm_FF, self).__init__()
-            self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+            self.conv1 = GCNConv(dataset.num_features, args.hid_dim, cached=True,
                                  normalize=not args.use_gdc)
-            self.layer_norm_1 = torch.nn.LayerNorm(16)
-            self.ff_layer = PositionwiseFeedForward(model_dim=16, d_hidden=8 * 16)
-            self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+            self.layer_norm_1 = torch.nn.LayerNorm(args.hid_dim)
+            self.ff_layer = PositionwiseFeedForward(model_dim=args.hid_dim, d_hidden=8 * args.hid_dim)
+            self.conv2 = GCNConv(args.hid_dim, dataset.num_classes, cached=True,
                                  normalize=not args.use_gdc)
 
         def forward(self):
@@ -92,15 +93,15 @@ def main(args):
     class DeepNet(torch.nn.Module):
         def __init__(self, layers=3):
             super(DeepNet, self).__init__()
-            self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+            self.conv1 = GCNConv(dataset.num_features, args.hid_dim, cached=True,
                                  normalize=not args.use_gdc)
             self.multi_conv_layers = nn.ModuleList()
             self.multi_conv_layers.append(self.conv1)
             for i in range(1, layers):
-                layer_i = GCNConv(16, 16, cached=True,
+                layer_i = GCNConv(args.hid_dim, args.hid_dim, cached=True,
                                   normalize=not args.use_gdc)
                 self.multi_conv_layers.append(layer_i)
-            self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+            self.conv2 = GCNConv(args.hid_dim, dataset.num_classes, cached=True,
                                  normalize=not args.use_gdc)
 
         def forward(self):
