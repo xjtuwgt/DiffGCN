@@ -126,11 +126,8 @@ def main(args):
                 res_x = self.res_fc(x)
             else:
                 res_x = x
-            norm_x = self.layer_norm_1(convx)
+            norm_x = F.dropout(self.layer_norm_1(convx), training=self.training)
             norm_x = norm_x + res_x
-
-            norm_x = F.dropout(norm_x, training=self.training)
-
             x_ff = self.ff_layer(norm_x)
             x_ff = F.dropout(x_ff, training=self.training)
             x = norm_x + x_ff
