@@ -8,6 +8,27 @@ from torch_geometric.datasets import Planetoid
 import torch_geometric.transforms as T
 from torch_geometric.nn import GCNConv, ChebConv  # noqa
 
+import numpy as np
+import torch
+import random
+import dgl
+import os
+from time import time
+from dgl import DGLGraph
+
+def set_seeds(seed):
+    "set random seeds"
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    # some cudnn methods can be random even after fixing the seed
+    # unless you tell it to be deterministic
+    torch.backends.cudnn.deterministic = True
+    dgl.random.seed(seed)
+
 
 import random
 import torch
@@ -68,6 +89,7 @@ class PositionwiseFeedForward(nn.Module):
 
 
 def main(args):
+    set_seeds(args.rand_seed)
     dataset = args.data
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', dataset)
     dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())

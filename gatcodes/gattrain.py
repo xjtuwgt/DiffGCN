@@ -17,7 +17,26 @@ import dgl
 from dgl.data import register_data_args
 from dgl.data import CoraGraphDataset, CiteseerGraphDataset, PubmedGraphDataset
 
+import numpy as np
+import torch
+import random
+import dgl
+import os
+from time import time
+from dgl import DGLGraph
 
+def set_seeds(seed):
+    "set random seeds"
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    # some cudnn methods can be random even after fixing the seed
+    # unless you tell it to be deterministic
+    torch.backends.cudnn.deterministic = True
+    dgl.random.seed(seed)
 
 
 from gatcodes.gat import GAT
@@ -86,6 +105,7 @@ def evaluate(model, features, labels, mask):
 
 def main(args):
     # load and preprocess dataset
+    set_seeds(args.rand_seed)
     if args.dataset == 'cora':
         data = CoraGraphDataset()
     elif args.dataset == 'citeseer':
