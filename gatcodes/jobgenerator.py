@@ -24,4 +24,4 @@ def generate_random_search_bash(task_num, data_name):
 
 
 if __name__ == '__main__':
-    generate_random_search_bash(task_num=10, data_name='cora')
+    generate_random_search_bash(task_num=5, data_name='cora')
