@@ -56,6 +56,10 @@ def main(args):
                                                dim=0), exact=True)
         data = gdc(data)
 
+        print(data.train_mask)
+        print(data.val_mask)
+        print(data.test_mask)
+
     class Net(torch.nn.Module):
         def __init__(self):
             super(Net, self).__init__()
@@ -205,4 +209,5 @@ def model_selection(args):
     print('Data: {} Model: {}Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
 
 
-model_selection(args=args)
+# model_selection(args=args)
+main(args)
