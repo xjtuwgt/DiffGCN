@@ -84,7 +84,6 @@ def evaluate(model, features, labels, mask):
         labels = labels[mask]
         return accuracy(logits, labels)
 
-
 def main(args):
     # load and preprocess dataset
     if args.dataset == 'cora':
