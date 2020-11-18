@@ -18,6 +18,7 @@ parser.add_argument('--topk', default=5, type=int)  #128
 parser.add_argument('--hid_dim', default=16, type=int)  #16
 parser.add_argument('--weight_decay', default=1e-4, type=float) #5e-4
 parser.add_argument('--lr', default=0.01, type=float) #5e-4
+parser.add_argument('--layers', default=3, type=int) #5e-4
 
 args = parser.parse_args()
 
@@ -102,16 +103,17 @@ def main(args):
             return F.log_softmax(x, dim=1)
 
     class DeepNet(torch.nn.Module):
-        def __init__(self, layers=3):
+        def __init__(self, layers=args.layers):
             super(DeepNet, self).__init__()
             self.conv1 = GCNConv(dataset.num_features, args.hid_dim, cached=True,
                                  normalize=not args.use_gdc)
-            self.multi_conv_layers = nn.ModuleList()
+
             if dataset.num_features != args.hid_dim:
                 self.res_fc = nn.Linear(dataset.num_features, args.hid_dim, bias=False)
             else:
                 self.res_fc = None
 
+            self.multi_conv_layers = nn.ModuleList()
             for i in range(1, layers):
                 layer_i = GCNConv(args.hid_dim, args.hid_dim, cached=True,
                                   normalize=not args.use_gdc)
