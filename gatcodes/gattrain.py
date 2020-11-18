@@ -267,9 +267,9 @@ if __name__ == '__main__':
                         help="indicates whether to use early stop or not")
     parser.add_argument('--fastmode', action="store_true", default=False,
                         help="skip re-evaluate the validation set")
-    parser.add_argument('--rand_seed', default=0,
+    parser.add_argument('--rand_seed', default=1,
                         help="skip re-evaluate the validation set")
-    parser.add_argument('--shuffle', action='store_true',
+    parser.add_argument('--shuffle', default=True, action='store_true',
                         help="random split")
     args = parser.parse_args()
     # print(args)
