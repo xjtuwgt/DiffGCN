@@ -239,5 +239,5 @@ def model_selection(args):
     print('Data: {} Model: {}Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
 
 
-# model_selection(args=args)
-main(args)
+model_selection(args=args)
+# main(args)
