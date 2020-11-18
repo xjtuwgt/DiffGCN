@@ -48,7 +48,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--use_gdc', default=True, action='store_true',
                     help='Use GDC preprocessing.')
 parser.add_argument('--data', default='Cora')
-parser.add_argument('--model', default='NetFF')
+parser.add_argument('--model', default='Net')
 parser.add_argument('--ppr', default=0.15, type=float) # 0.05
 parser.add_argument('--topk', default=5, type=int)  #128
 parser.add_argument('--hid_dim', default=16, type=int)  #16
