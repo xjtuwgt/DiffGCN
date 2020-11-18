@@ -171,9 +171,9 @@ def main(args):
 
         def forward(self):
             x, edge_index, edge_weight = data.x, data.edge_index, data.edge_attr
-            x = F.relu(self.conv1(x, edge_index, edge_weight))
             if self.res_fc is not None:
                 res_x = self.res_fc(x)
+            x = F.relu(self.conv1(x, edge_index, edge_weight))
             x = x + res_x
             for layer_i in self.multi_conv_layers:
                 x_temp = x
