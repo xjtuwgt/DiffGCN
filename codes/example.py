@@ -230,8 +230,8 @@ def model_selection(args):
     best_setting = None
     ppr_range = [0.05, 0.1, 0.15, 0.2]
     topk_range = [32, 64, 128]
-    hid_dim_range = [16, 64, 128]
-    lr_range = [0.01, 0.005]
+    hid_dim_range = [16, 64]
+    lr_range = [0.01]
     weight_decay_range = [1e-4]
     best_acc = 0
     for ppr in ppr_range:
