@@ -193,6 +193,8 @@ def main(args):
         print('Deep model layer number = {}'.format(args.layers))
     else:
         raise ValueError('model %s not supported' % args.model)
+
+    print(model)
     optimizer = torch.optim.Adam([
         dict(params=model.conv1.parameters(), weight_decay=args.weight_decay),
         dict(params=model.conv2.parameters(), weight_decay=0)
