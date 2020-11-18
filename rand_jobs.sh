@@ -1,5 +1,5 @@
 #!/bin/sh
-JOBS_PATH=cora_jobs
+JOBS_PATH=gat_jobs
 LOGS_PATH=logs
 for ENTRY in "${JOBS_PATH}"/*.sh; do
   chmod +x $ENTRY
