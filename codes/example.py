@@ -16,6 +16,8 @@ parser.add_argument('--model', default='Net')
 parser.add_argument('--ppr', default=0.15, type=float) # 0.05
 parser.add_argument('--topk', default=5, type=int)  #128
 parser.add_argument('--hid_dim', default=16, type=int)  #16
+parser.add_argument('--weight_decay', default=1e-4, type=float) #5e-4
+parser.add_argument('--lr', default=0.01, type=float) #5e-4
 
 args = parser.parse_args()
 
@@ -78,7 +80,7 @@ def main(args):
             else:
                 self.res_fc = None
             self.layer_norm_1 = torch.nn.LayerNorm(args.hid_dim)
-            self.ff_layer = PositionwiseFeedForward(model_dim=args.hid_dim, d_hidden=8 * args.hid_dim)
+            self.ff_layer = PositionwiseFeedForward(model_dim=args.hid_dim, d_hidden=4 * args.hid_dim)
             self.conv2 = GCNConv(args.hid_dim, dataset.num_classes, cached=True,
                                  normalize=not args.use_gdc)
 
@@ -129,9 +131,9 @@ def main(args):
     else:
         model, data = DeepNet().to(device), data.to(device)
     optimizer = torch.optim.Adam([
-        dict(params=model.conv1.parameters(), weight_decay=5e-4),
+        dict(params=model.conv1.parameters(), weight_decay=args.weight_decay),
         dict(params=model.conv2.parameters(), weight_decay=0)
-    ], lr=0.01)  # Only perform weight-decay on first convolution.
+    ], lr=args.lr)  # Only perform weight-decay on first convolution.
 
 
     def train():
@@ -168,23 +170,29 @@ def model_selection(args):
     data = 'Cora'
     model = 'NetFF'
     best_setting = None
-    ppr_range = [0.05, 0.1, 0.15, 0.2, 0.25]
-    topk_range = [32, 64, 128]
-    hid_dim_range = [16, 32, 64, 128, 256]
+    ppr_range = [0.05, 0.1, 0.15, 0.2]
+    topk_range = [64, 128]
+    hid_dim_range = [16, 64, 256]
+    lr_range = [0.01, 0.005]
+    weight_decay_range = [1e-4, 5e-5, 1e-5]
     best_acc = 0
     for ppr in ppr_range:
         for topk in topk_range:
             for hid_dim in hid_dim_range:
-                args.ppr = ppr
-                args.data = data
-                args.model = model
-                args.topk = topk
-                args.hid_dim = hid_dim
-                test_acc_i = main(args)
-                if best_acc < test_acc_i:
-                    best_acc = test_acc_i
-                    best_setting = [ppr, topk, hid_dim]
-                print('*' * 75)
+                for lr in lr_range:
+                    for weight_decay in weight_decay_range:
+                        args.ppr = ppr
+                        args.data = data
+                        args.model = model
+                        args.topk = topk
+                        args.lr = lr
+                        args.weight_decay = weight_decay
+                        args.hid_dim = hid_dim
+                        test_acc_i = main(args)
+                        if best_acc < test_acc_i:
+                            best_acc = test_acc_i
+                            best_setting = [ppr, topk, hid_dim, lr, weight_decay]
+                        print('*' * 75)
     print('Data: {} Model: {}Best acc = {}, best setting = {}'.format(data, model, best_acc, best_setting))
 
 
