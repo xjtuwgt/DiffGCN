@@ -81,14 +81,14 @@ def main(args):
                                                dim=0), exact=True)
         data = gdc(data)
         if args.shuffle:
-            print('Performing shuffle... over {}'.format(args.data))
+            print('Performing shuffle... over {} using model {}'.format(args.data, args.model))
             train_dev_test_tuple = (data.train_mask.sum().data.item(), data.val_mask.sum().data.item(), data.test_mask.sum().item())
             train_mask, val_mask, test_mask = random_split(N=data.train_mask.shape[0], train_dev_test_tuple=train_dev_test_tuple, random_seed=args.rand_seed)
             data.train_mask = train_mask
             data.val_mask = val_mask
             data.test_mask = test_mask
         else:
-            print('Standard splitting...over {}'.format(args.data))
+            print('Standard splitting...over {} using model {}'.format(args.data, args.model))
 
     class Net(torch.nn.Module):
         def __init__(self):
