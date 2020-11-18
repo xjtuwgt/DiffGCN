@@ -11,9 +11,11 @@ from torch_geometric.nn import GCNConv, ChebConv  # noqa
 parser = argparse.ArgumentParser()
 parser.add_argument('--use_gdc', default=True, action='store_true',
                     help='Use GDC preprocessing.')
+parser.add_argument('--data', default='Cora')
+parser.add_argument('--model', default='Net')
 args = parser.parse_args()
 
-dataset = 'Pubmed'
+dataset = args.data
 path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', dataset)
 dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 data = dataset[0]
@@ -103,7 +105,12 @@ class DeepNet(torch.nn.Module):
         return F.log_softmax(x, dim=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model, data = Net().to(device), data.to(device)
+if args.model == 'Net':
+    model, data = Net().to(device), data.to(device)
+elif args.model == 'NetFF':
+    model, data = NetLayerNorm_FF().to(device), data.to(device)
+else:
+    model, data = DeepNet().to(device), data.to(device)
 optimizer = torch.optim.Adam([
     dict(params=model.conv1.parameters(), weight_decay=5e-4),
     dict(params=model.conv2.parameters(), weight_decay=0)
