@@ -190,6 +190,7 @@ def main(args):
         model, data = NetLayerNorm_FF().to(device), data.to(device)
     elif args.model == 'Deep':
         model, data = DeepNet().to(device), data.to(device)
+        print('Deep model layer number = {}'.format(args.layers))
     else:
         raise ValueError('model %s not supported' % args.model)
     optimizer = torch.optim.Adam([
