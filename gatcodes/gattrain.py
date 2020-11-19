@@ -226,7 +226,7 @@ def main(args):
 
 
 def model_selection(args):
-    num_hidden_range = [8, 32, 64]
+    num_hidden_range = [8, 32, 64, 128]
     in_drop_range = [0.2, 0.4, 0.6]
     att_drop_range = [0.4, 0.6]
     lr_range = [0.005]
@@ -260,7 +260,7 @@ if __name__ == '__main__':
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument('--cuda', action='store_true',
                         help='Use CUDA preprocessing.')
-    parser.add_argument("--epochs", type=int, default=200,
+    parser.add_argument("--epochs", type=int, default=300,
                         help="number of training epochs")
     parser.add_argument("--num-heads", type=int, default=8,
                         help="number of hidden attention heads")
