@@ -159,7 +159,7 @@ class GATConvFF(nn.Module):
                  feat_drop=0.,
                  attn_drop=0.,
                  negative_slope=0.2,
-                 residual=False,
+                 residual=True,
                  allow_zero_in_degree=False):
         super(GATConvFF, self).__init__()
         self._num_heads = num_heads
