@@ -314,8 +314,8 @@ class GATConvFF(nn.Module):
 
             if self.res_fc is not None:
                 resval = self.res_fc(h_dst).view(h_dst.shape[0], -1, self._out_feats).flatten(1)
-                rst_norm = rst_norm + resval
+                rst_norm = self.feat_drop(rst_norm) + resval
             # activation
             rst = self.activation(rst_norm)
-            rst = rst_norm + rst
+            rst = rst_norm + self.feat_drop(rst)
             return rst
