@@ -19,6 +19,8 @@ import random
 import os
 
 
+
+
 def get_free_gpu():
     gpu_stats = subprocess.check_output(["nvidia-smi", "--format=csv", "--query-gpu=memory.used,memory.free"])
     gpu_df = pd.read_csv(StringIO(gpu_stats.decode("utf-8")),
@@ -69,6 +71,14 @@ def gpu_setting(num_gpu=1):
     else:
         return set_free_cuda()
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+available_device_count = torch.cuda.device_count()
+if available_device_count > 0:
+    print('GPU number is {}'.format(available_device_count))
+    # ++++++++++++++++++++++++++++++++++
+    device_ids, used_memory = gpu_setting(available_device_count)
+    # ++++++++++++++++++++++++++++++++++
+    device = torch.device("cuda:{}".format(device_ids[0]))
 
 def set_seeds(seed):
     "set random seeds"
@@ -242,16 +252,7 @@ def main(args):
             x = self.conv2(x, edge_index, edge_weight)
             return F.log_softmax(x, dim=1)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    available_device_count = torch.cuda.device_count()
-    if available_device_count > 0:
-        print('GPU number is {}'.format(available_device_count))
-        if args.gpu_num > available_device_count:
-            args.gpu_num = available_device_count
-        # ++++++++++++++++++++++++++++++++++
-        device_ids, used_memory = gpu_setting(args.gpu_num)
-        # ++++++++++++++++++++++++++++++++++
-        device = torch.device("cuda:{}".format(device_ids[0]))
+
 
     if args.model == 'Net':
         model, data = Net().to(device), data.to(device)
