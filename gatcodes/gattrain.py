@@ -38,7 +38,7 @@ def set_seeds(seed):
     dgl.random.seed(seed)
 
 
-from gatcodes.gat import GAT
+from gatcodes.gat import GAT, GATFF
 import argparse
 
 class EarlyStopping:
@@ -156,7 +156,7 @@ def main(args):
     n_edges = g.number_of_edges()
     # create model
     heads = ([args.num_heads] * args.num_layers) + [args.num_out_heads]
-    model = GAT(g,
+    model = GATFF(g,
                 args.num_layers,
                 num_feats,
                 args.num_hidden,
@@ -256,7 +256,7 @@ if __name__ == '__main__':
         help=
         "The input dataset. Can be cora, citeseer, pubmed, syn(synthetic dataset) or reddit"
     )
-    parser.add_argument("--gpu", type=int, default=0,
+    parser.add_argument("--gpu", type=int, default=-1,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument('--cuda', action='store_true',
                         help='Use CUDA preprocessing.')
