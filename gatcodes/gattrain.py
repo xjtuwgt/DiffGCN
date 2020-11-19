@@ -256,7 +256,7 @@ if __name__ == '__main__':
         help=
         "The input dataset. Can be cora, citeseer, pubmed, syn(synthetic dataset) or reddit"
     )
-    parser.add_argument("--gpu", type=int, default=-1,
+    parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument('--cuda', action='store_true',
                         help='Use CUDA preprocessing.')
