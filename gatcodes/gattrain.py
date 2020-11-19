@@ -260,7 +260,7 @@ if __name__ == '__main__':
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument('--cuda', action='store_true',
                         help='Use CUDA preprocessing.')
-    parser.add_argument("--epochs", type=int, default=300,
+    parser.add_argument("--epochs", type=int, default=200,
                         help="number of training epochs")
     parser.add_argument("--num-heads", type=int, default=8,
                         help="number of hidden attention heads")
