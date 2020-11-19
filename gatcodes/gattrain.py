@@ -226,7 +226,7 @@ def main(args):
 
 
 def model_selection(args):
-    num_hidden_range = [8, 16, 32, 64]
+    num_hidden_range = [8, 64, 128, 256]
     in_drop_range = [0.2, 0.4, 0.6]
     att_drop_range = [0.4, 0.6]
     lr_range = [0.005]
