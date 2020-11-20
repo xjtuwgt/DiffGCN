@@ -190,6 +190,7 @@ class GATConvFF(nn.Module):
         self.reset_parameters()
 
         self.layer_norm = th.nn.LayerNorm(out_feats*num_heads)
+        self.ff_layer_norm = th.nn.LayerNorm(out_feats * num_heads)
         self.activation = PositionwiseFeedForward(model_dim=out_feats *num_heads, d_hidden=4*out_feats *num_heads)
 
     def reset_parameters(self):
@@ -318,4 +319,5 @@ class GATConvFF(nn.Module):
             # activation
             rst = self.activation(rst_norm)
             rst = rst_norm + self.feat_drop(rst)
+            rst = self.ff_layer_norm(rst)
             return rst
