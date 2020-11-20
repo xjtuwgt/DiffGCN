@@ -288,7 +288,7 @@ if __name__ == '__main__':
                         help="skip re-evaluate the validation set")
     parser.add_argument('--rand_seed', default=5, type=int,
                         help="skip re-evaluate the validation set")
-    parser.add_argument('--shuffle', default=False, action='store_true',
+    parser.add_argument('--shuffle', action='store_true',
                         help="random split")
     args = parser.parse_args()
     # print(args)
