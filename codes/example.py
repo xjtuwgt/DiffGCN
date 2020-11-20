@@ -200,6 +200,7 @@ def main(args):
             else:
                 self.res_fc = None
             self.layer_norm_1 = torch.nn.LayerNorm(args.hid_dim)
+            self.layer_norm_2 = torch.nn.LayerNorm(args.hid_dim)
             self.ff_layer = PositionwiseFeedForward(model_dim=args.hid_dim, d_hidden=4 * args.hid_dim)
             self.conv2 = GCNConv(args.hid_dim, dataset.num_classes, cached=True,
                                  normalize=not args.use_gdc)
@@ -216,6 +217,7 @@ def main(args):
             x_ff = self.ff_layer(norm_x)
             x_ff = F.dropout(x_ff, training=self.training)
             x = norm_x + x_ff
+            x = self.layer_norm_2(x)
             x = self.conv2(x, edge_index, edge_weight)
             return F.log_softmax(x, dim=1)
 
