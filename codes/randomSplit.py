@@ -25,7 +25,6 @@ def multi_round_split(N, train_dev_test_tuple, round = 10):
         split_res.append((train, valid, test))
     return split_res
 
-
 if __name__ == '__main__':
     N = 10
     train_dev_test_tuple = (6, 2, 2)
